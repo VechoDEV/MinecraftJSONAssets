@@ -13,7 +13,10 @@ import java.text.ParseException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 
 import org.apache.commons.io.IOUtils;
 
@@ -26,11 +29,17 @@ public class Main extends JFrame {
 	
 	public Main() {
 		this.setSize(600, 350);
-		area = new JTextArea(50, 10);
+		area = new JTextArea();
+		area.setColumns(10);
+		area.setRows(1);
+		area.setLineWrap(true);
+		area.setWrapStyleWord(true);
 		area.setEnabled(false);
 		area.setDisabledTextColor(Color.WHITE);
 		area.setBackground(Color.BLACK);
-		this.add(area);
+        DefaultCaret caret = (DefaultCaret) area.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		this.add(new JScrollPane(area));
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -41,7 +50,11 @@ public class Main extends JFrame {
 			@Override
 			public void write(int b) throws IOException {
 		        area.append(String.valueOf((char)b));
-		        area.setCaretPosition(area.getDocument().getLength());
+		        try {
+					area.setCaretPosition(area.getLineStartOffset(area.getLineCount() - 1));
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
 			}
 		}));
 		
@@ -50,7 +63,11 @@ public class Main extends JFrame {
 			@Override
 			public void write(int b) throws IOException {
 		        area.append(String.valueOf((char)b));
-		        area.setCaretPosition(area.getDocument().getLength());
+		        try {
+					area.setCaretPosition(area.getLineStartOffset(area.getLineCount() - 1));
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
 			}
 		}));
 	}
